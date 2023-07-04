@@ -20,9 +20,10 @@
 
 int main(int argc, char *argv[]) {
 
-    if(argc != 2){
-        printf("Usage: ./pi_omp N\n");
+    if(argc != 3){
+        printf("Usage: ./pi_omp N T\n");
         printf("N: Number of steps\n");
+        printf("T: Number of threads\n");
         exit(-1);
     }
 
@@ -34,9 +35,12 @@ int main(int argc, char *argv[]) {
     gettimeofday(&time_start, NULL);
 
     int num_steps = atoi(argv[1]);
+    int num_threads = atoi(argv[2]);
     double x, sum = 0.0;
     double step = 1.0 / (double) num_steps;
 
+    omp_set_num_threads(num_threads);
+    
     #pragma omp parallel for private(x) reduction(+: sum)
     for(int i = 1; i <= num_steps; i++){
         x = (i - 0.5) * step;
