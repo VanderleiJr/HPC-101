@@ -67,25 +67,6 @@ void initialize_grid(){
     }
 }
 
-// salva o grid num arquivo
-void save_grid(){
-
-    char file_name[30];
-    sprintf(file_name, "grid_laplace.txt");
-
-    // salva o resultado
-    FILE *file;
-    file = fopen(file_name, "w");
-
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            fprintf(file, "%lf ", grid[i][j]);
-        }
-        fprintf(file, "\n");
-    }
-
-    fclose(file);
-}
 
 // interações do método de Jacobi em uma quantidade de colunas
 void* jacobi_iteration(void* args) {
@@ -111,7 +92,7 @@ void* jacobi_iteration(void* args) {
 int main(int argc, char *argv[]){
 
     if(argc != 3){
-        printf("Usage: ./laplace_parallel N M\n");
+        printf("Usage: ./laplace_pth N M\n");
         printf("N: The size of each side of the domain (grid)\n");
         printf("M: The number of threads to use\n");
         exit(-1);
@@ -146,17 +127,16 @@ int main(int argc, char *argv[]){
 
         // cria um array com os id das threads
         pthread_t threads[num_threads];
+        ThreadArgs threadArgs[num_threads];
 
         // cria e executa as threads
         for (int i = 0; i < num_threads; i++) {
-            ThreadArgs* threadArgs = (ThreadArgs*) malloc(sizeof(ThreadArgs));
-
             // calcula a quantidade de colunas para essa thread
             int chunk_size = size / num_threads;
-            threadArgs->start_row = i * chunk_size + 1;
-            threadArgs->end_row = (i == num_threads - 1) ? size - 1 : (i + 1) * chunk_size + 1;
+            threadArgs[i].start_row = i * chunk_size + 1;
+            threadArgs[i].end_row = (i == num_threads - 1) ? size - 1 : (i + 1) * chunk_size + 1;
 
-            pthread_create(&threads[i], NULL, jacobi_iteration, (void*) threadArgs);
+            pthread_create(&threads[i], NULL, jacobi_iteration, (void*) &threadArgs[i]);
         }
 
         // junta as threads e calcula o erro máximo
@@ -173,9 +153,6 @@ int main(int argc, char *argv[]){
                 grid[i][j] = new_grid[i][j];
             }
         }
-
-        //if(iter % 100 == 0)
-            //printf("Error of %0.10lf at iteration %d\n", err, iter);
 
         iter++;
     }
