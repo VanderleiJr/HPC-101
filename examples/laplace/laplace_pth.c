@@ -186,8 +186,6 @@ int main(int argc, char *argv[]){
     double exec_time = (double) (time_end.tv_sec - time_start.tv_sec) +
                        (double) (time_end.tv_usec - time_start.tv_usec) / 1000000.0;
 
-    //salva no arquivo
-    save_grid();
 
     printf("\nKernel executed in %lf seconds with %d iterations and error of %0.10lf\n", exec_time, iter, err);
 
