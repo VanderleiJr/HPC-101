@@ -137,8 +137,8 @@ int main(int argc, char *argv[]){
             }
         }
 
-        if(iter % 100 == 0)
-            printf("Error of %0.10lf at iteration %d\n", err, iter);
+        //if(iter % 100 == 0)
+            //printf("Error of %0.10lf at iteration %d\n", err, iter);
 
         iter++;
     }
